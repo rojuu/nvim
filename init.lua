@@ -98,6 +98,8 @@ require('lazy').setup({
     },
   },
 
+  'tpope/vim-fugitive',
+
   {
     'folke/which-key.nvim',
     event = 'VimEnter',
