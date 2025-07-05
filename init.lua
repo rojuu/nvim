@@ -17,8 +17,7 @@ vim.o.undofile = true
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
--- without this it will pop in and out with gitsigns
-vim.o.signcolumn = 'yes'
+vim.o.signcolumn = 'no'
 
 vim.o.updatetime = 250
 vim.o.timeoutlen = 300
@@ -95,19 +94,6 @@ require('lazy').setup({
         ["tabstop"] = "detected", -- If the option value is 'detected', The value is set to the automatically detected indent size.
         ["softtabstop"] = "detected",
         ["shiftwidth"] = "detected",
-      },
-    },
-  },
-
-  {
-    'lewis6991/gitsigns.nvim',
-    opts = {
-      signs = {
-        add = { text = '+' },
-        change = { text = '~' },
-        delete = { text = '_' },
-        topdelete = { text = '‾' },
-        changedelete = { text = '~' },
       },
     },
   },
