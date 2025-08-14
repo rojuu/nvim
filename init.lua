@@ -49,13 +49,6 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
-local open_quickfix = function()
-  vim.diagnostic.setloclist { open = true }
-end
-local close_quickfix = function()
-  vim.diagnostic.setloclist { open = false }
-end
-
 local goto_next_diagnostic = function()
   vim.diagnostic.jump { count = 1 }
 end
@@ -63,12 +56,14 @@ local goto_prev_diagnostic = function()
   vim.diagnostic.jump { count = -1 }
 end
 
-vim.keymap.set('n', '<leader>qq', close_quickfix, { desc = 'Close diagnostic [Q]uickfix list' })
-vim.keymap.set('n', '<leader>qo', open_quickfix, { desc = 'Open diagnostic [Q]uickfix list' })
-vim.keymap.set('n', '<leader>qn', goto_next_diagnostic, { desc = 'Go to next [Q]uickfix diagnostic' })
-vim.keymap.set('n', '<leader>qn', goto_prev_diagnostic, { desc = 'Go to prev [Q]uickfix diagnostic' })
-vim.keymap.set('n', '<M-n>', goto_next_diagnostic, { desc = 'Go to next [Q]uickfix diagnostic' })
-vim.keymap.set('n', '<M-p>', goto_prev_diagnostic, { desc = 'Go to prev [Q]uickfix diagnostic' })
+vim.keymap.set('n', '<leader>qq', ':cclose<CR>', { desc = 'Close [Q]uickfix list' })
+vim.keymap.set('n', '<leader>qo', ':copen<CR>', { desc = 'Open [Q]uickfix list' })
+vim.keymap.set('n', '<leader>qd', vim.diagnostic.setqflist, { desc = 'Populate [Q]uickfix list with [D]iagnostics' })
+vim.keymap.set('n', '<M-n>', ':cnext<CR>', { desc = 'Go to next [Q]uickfix' })
+vim.keymap.set('n', '<M-p>', ':cprev<CR>', { desc = 'Go to prev [Q]uickfix' })
+
+vim.keymap.set('n', '<leader>dn', goto_next_diagnostic, { desc = 'Go [D]iagnostic [N]ext' })
+vim.keymap.set('n', '<leader>dn', goto_prev_diagnostic, { desc = 'Go [D]iagnostic [P]prev' })
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
