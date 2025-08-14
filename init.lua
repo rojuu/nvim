@@ -376,8 +376,6 @@ require('lazy').setup({
 
       -- Allows extra capabilities provided by blink.cmp
       'saghen/blink.cmp',
-
-      'netmute/ctags-lsp.nvim',
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -621,10 +619,6 @@ require('lazy').setup({
             require('lspconfig')[server_name].setup(server)
           end,
         },
-      }
-
-      require('lspconfig').ctags_lsp.setup {
-        filetypes = { 'cpp', 'c', 'h', 'hpp' },
       }
     end,
   },
