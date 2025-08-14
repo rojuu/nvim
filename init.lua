@@ -17,7 +17,7 @@ vim.o.undofile = true
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
-vim.o.signcolumn = 'no'
+vim.o.signcolumn = 'yes'
 
 vim.o.updatetime = 250
 vim.o.timeoutlen = 300
@@ -39,8 +39,6 @@ vim.o.scrolloff = 0
 vim.o.confirm = true
 
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-
-vim.keymap.set('n', '-', ':Explore<CR>')
 
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
@@ -310,6 +308,31 @@ require('lazy').setup({
     },
   },
 
+  { -- Adds git related signs to the gutter, as well as utilities for managing changes
+    'lewis6991/gitsigns.nvim',
+    config = function()
+      local gitsigns = require 'gitsigns'
+      gitsigns.setup {
+        signs = {
+          add = { text = '+' },
+          change = { text = '~' },
+          delete = { text = '_' },
+          topdelete = { text = '‾' },
+          changedelete = { text = '~' },
+        },
+      }
+
+      local next_hunk = function()
+        gitsigns.nav_hunk 'next'
+      end
+      local prev_hunk = function()
+        gitsigns.nav_hunk 'prev'
+      end
+      vim.keymap.set('n', ']g', next_hunk, { desc = 'Goto next git hunk' })
+      vim.keymap.set('n', '[g', prev_hunk, { desc = 'Goto prevgit hunk' })
+    end,
+  },
+
   -- LSP Plugins
   {
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
@@ -326,7 +349,12 @@ require('lazy').setup({
   {
     'pmizio/typescript-tools.nvim',
     dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-    opts = {},
+    -- opts = {},
+    config = function()
+      require('typescript-tools').setup {}
+      vim.keymap.set('n', 'grs', ':TSToolsGoToSourceDefinition<CR>', { desc = 'Typescript goto source definition' })
+      vim.keymap.set('n', 'grf', ':TSToolsFileReferences<CR>', { desc = 'Typescript goto file references' })
+    end,
   },
 
   {
@@ -572,7 +600,6 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
         'prettierd', -- Formatting js/ts/jsx/tsx
-        'ts_ls', -- for typescript-tools LSP plugin
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
