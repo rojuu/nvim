@@ -62,6 +62,7 @@ vim.keymap.set('n', '<leader>qd', vim.diagnostic.setqflist, { desc = 'Populate [
 vim.keymap.set('n', '<M-n>', ':cnext<CR>', { desc = 'Go to next [Q]uickfix' })
 vim.keymap.set('n', '<M-p>', ':cprev<CR>', { desc = 'Go to prev [Q]uickfix' })
 
+vim.keymap.set('n', '<leader>do', vim.diagnostic.open_float, { desc = '[D]iagnostic [O]pen in floating window' })
 vim.keymap.set('n', '<leader>dn', goto_next_diagnostic, { desc = 'Go [D]iagnostic [N]ext' })
 vim.keymap.set('n', '<leader>dn', goto_prev_diagnostic, { desc = 'Go [D]iagnostic [P]prev' })
 
