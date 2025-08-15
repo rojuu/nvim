@@ -321,12 +321,12 @@ require('lazy').setup({
       -- Firestore rules
       parser_config.rules = {
         install_info = {
-          url = 'https://github.com/ishowta/tree-sitter-firebase-rules',
+          url = 'https://github.com/rojuu/tree-sitter-firebase-rules',
           revision = '038f798fc68314696c59c571bcc022546c3bf790',
           branch = 'main',
           files = { 'src/parser.c' },
           generate_requires_npm = false, -- if stand-alone parser without npm dependencies
-          requires_generate_from_grammar = true,
+          requires_generate_from_grammar = true, -- could regenaret in the repo, but too lazy to do that. At least the grammar file works fine
         },
         filetype = 'rules', -- if filetype does not match the parser name
       }
