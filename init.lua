@@ -293,27 +293,47 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs',
-    opts = {
-      ensure_installed = {
-        'bash',
-        'c',
-        'diff',
-        'html',
-        'lua',
-        'luadoc',
-        'markdown',
-        'markdown_inline',
-        'query',
-        'vim',
-        'vimdoc',
-      },
-      auto_install = true,
-      highlight = {
-        enable = true,
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
-    },
+    config = function()
+      require('nvim-treesitter.configs').setup {
+        ensure_installed = {
+          'bash',
+          'c',
+          'diff',
+          'html',
+          'lua',
+          'luadoc',
+          'markdown',
+          'markdown_inline',
+          'query',
+          'vim',
+          'vimdoc',
+        },
+        auto_install = true,
+        highlight = {
+          enable = true,
+          additional_vim_regex_highlighting = { 'ruby' },
+        },
+        indent = { enable = true, disable = { 'ruby' } },
+      }
+
+      local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
+
+      -- Firestore rules
+      parser_config.rules = {
+        install_info = {
+          url = 'https://github.com/ishowta/tree-sitter-firebase-rules',
+          revision = '038f798fc68314696c59c571bcc022546c3bf790',
+          branch = 'main',
+          files = { 'src/parser.c' },
+          generate_requires_npm = false, -- if stand-alone parser without npm dependencies
+          requires_generate_from_grammar = true,
+        },
+        filetype = 'rules', -- if filetype does not match the parser name
+      }
+      -- TODO: Port this to lua when I'm not lazy
+      -- For .rules files the ft was detected as "hog" for some reason
+      vim.cmd [[au BufRead,BufNewFile *.rules set filetype=rules]]
+    end,
   },
 
   {
