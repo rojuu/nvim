@@ -64,6 +64,18 @@ vim.keymap.set('n', '<leader>do', vim.diagnostic.open_float, { desc = '[D]iagnos
 vim.keymap.set('n', '<leader>dn', goto_next_diagnostic, { desc = 'Go [D]iagnostic [N]ext' })
 vim.keymap.set('n', '<leader>dn', goto_prev_diagnostic, { desc = 'Go [D]iagnostic [P]prev' })
 
+vim.keymap.set('n', '<leader>y', '"*y', { desc = 'Yank to system clipboard' })
+vim.keymap.set('v', '<leader>y', '"*y', { desc = 'Yank to system clipboard' })
+vim.keymap.set('n', '<leader>p', '"*p', { desc = 'Paste from system clipboard' })
+vim.keymap.set('v', '<leader>p', '"*p', { desc = 'Paste from system clipboard' })
+
+vim.keymap.set('n', '<leader>Yr', function()
+  vim.fn.setreg('*', vim.fn.expand '%')
+end, { desc = 'Yank relative file path to system clipboard' })
+vim.keymap.set('n', '<leader>Yf', function()
+  vim.fn.setreg('*', vim.fn.expand '%:p')
+end, { desc = 'Yank full file path to system clipboard' })
+
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
@@ -290,6 +302,27 @@ require('lazy').setup({
   },
 
   {
+    'nvim-treesitter/nvim-treesitter-context',
+    config = function()
+      require('treesitter-context').setup {
+        enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
+        multiwindow = false, -- Enable multiwindow support.
+        max_lines = 5, -- How many lines the window should span. Values <= 0 mean no limit.
+        min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+        line_numbers = true,
+        multiline_threshold = 20, -- Maximum number of lines to show for a single context
+        trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+        mode = 'topline', -- Line used to calculate context. Choices: 'cursor', 'topline'
+        -- Separator between context and content. Should be a single character string, like '-'.
+        -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+        separator = nil,
+        zindex = 20, -- The Z-index of the context window
+        on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
+      }
+    end,
+  },
+
+  {
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs',
@@ -358,6 +391,12 @@ require('lazy').setup({
       end
       vim.keymap.set('n', ']g', next_hunk, { desc = 'Goto next git hunk' })
       vim.keymap.set('n', '[g', prev_hunk, { desc = 'Goto prevgit hunk' })
+
+      vim.keymap.set('n', '<leader>bl', gitsigns.blame_line, { desc = 'Git [B]lame [L]line}' })
+      vim.keymap.set('n', '<leader>bb', gitsigns.blame, { desc = 'Git [B]lame [L]line}' })
+
+      vim.keymap.set('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'Git [H]unk [P]review}' })
+      vim.keymap.set('n', '<leader>hi', gitsigns.preview_hunk_inline, { desc = 'Git [H]unk [I]inline Preview}' })
     end,
   },
 
@@ -410,8 +449,8 @@ require('lazy').setup({
           map('grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
           map('gri', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
           map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
           map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-          map('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
           map('gO', require('telescope.builtin').lsp_document_symbols, 'Open Document Symbols')
           map('gW', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
           map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
