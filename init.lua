@@ -64,6 +64,11 @@ vim.keymap.set('n', '<leader>do', vim.diagnostic.open_float, { desc = '[D]iagnos
 vim.keymap.set('n', '<leader>dn', goto_next_diagnostic, { desc = 'Go [D]iagnostic [N]ext' })
 vim.keymap.set('n', '<leader>dn', goto_prev_diagnostic, { desc = 'Go [D]iagnostic [P]prev' })
 
+vim.keymap.set('n', '<C-Right>', '<C-w>>', { desc = 'Increase width of window' })
+vim.keymap.set('n', '<C-Left>', '<C-w><', { desc = 'Decrease width of window' })
+vim.keymap.set('n', '<C-Up>', '<C-w>+', { desc = 'Increase height of window' })
+vim.keymap.set('n', '<C-Down>', '<C-w>-', { desc = 'Decrease height of window' })
+
 vim.keymap.set('n', '<leader>y', '"*y', { desc = 'Yank to system clipboard' })
 vim.keymap.set('v', '<leader>y', '"*y', { desc = 'Yank to system clipboard' })
 vim.keymap.set('n', '<leader>p', '"*p', { desc = 'Paste from system clipboard' })
