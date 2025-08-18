@@ -44,7 +44,7 @@ return {
         transparent = true,
         italics = true,
       }
-      vim.cmd.colorscheme 'jellybeans'
+      vim.cmd.colorscheme 'jellybeans-light'
     end,
   },
 
