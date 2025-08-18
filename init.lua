@@ -76,10 +76,13 @@ vim.keymap.set('v', '<leader>p', '"*p', { desc = 'Paste from system clipboard' }
 
 vim.keymap.set('n', '<leader>Yr', function()
   vim.fn.setreg('*', vim.fn.expand '%')
-end, { desc = 'Yank relative file path to system clipboard' })
+end, { desc = 'Yank relative file name to system clipboard' })
 vim.keymap.set('n', '<leader>Yf', function()
   vim.fn.setreg('*', vim.fn.expand '%:p')
-end, { desc = 'Yank full file path to system clipboard' })
+end, { desc = 'Yank full file name to system clipboard' })
+vim.keymap.set('n', '<leader>Yp', function()
+  vim.fn.setreg('*', vim.fn.expand '%:p:h')
+end, { desc = 'Yank full path of current file to system clipboard' })
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
