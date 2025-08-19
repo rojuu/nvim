@@ -25,7 +25,7 @@ return {
       vim.keymap.set('n', '[g', prev_hunk, { desc = 'Goto prevgit hunk' })
 
       vim.keymap.set('n', '<leader>bl', gitsigns.blame_line, { desc = 'Git [B]lame [L]line}' })
-      vim.keymap.set('n', '<leader>bb', gitsigns.blame, { desc = 'Git [B]lame [L]line}' })
+      vim.keymap.set('n', '<leader>bb', gitsigns.blame, { desc = 'Git [B]lame Buffer' })
 
       vim.keymap.set('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'Git [H]unk [P]review}' })
       vim.keymap.set('n', '<leader>hi', gitsigns.preview_hunk_inline, { desc = 'Git [H]unk [I]inline Preview}' })
