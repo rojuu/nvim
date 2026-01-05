@@ -92,6 +92,14 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+vim.api.nvim_create_autocmd('FocusGained', {
+  desc = 'Update file when there are changes',
+  group = vim.api.nvim_create_augroup('roju-focus-checktime', { clear = true }),
+  callback = function()
+    vim.cmd 'checktime'
+  end,
+})
+
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
