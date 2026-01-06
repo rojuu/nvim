@@ -155,6 +155,9 @@ return {
           end,
         },
       }
+
+      local lspconfig = require 'lspconfig'
+      lspconfig.gdscript.setup {}
     end,
   },
 }
