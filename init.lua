@@ -62,7 +62,7 @@ vim.keymap.set('n', '<M-p>', ':cprev<CR>', { desc = 'Go to prev [Q]uickfix' })
 
 vim.keymap.set('n', '<leader>do', vim.diagnostic.open_float, { desc = '[D]iagnostic [O]pen in floating window' })
 vim.keymap.set('n', '<leader>dn', goto_next_diagnostic, { desc = 'Go [D]iagnostic [N]ext' })
-vim.keymap.set('n', '<leader>dn', goto_prev_diagnostic, { desc = 'Go [D]iagnostic [P]prev' })
+vim.keymap.set('n', '<leader>dp', goto_prev_diagnostic, { desc = 'Go [D]iagnostic [P]prev' })
 
 vim.keymap.set('n', '<C-Right>', '<C-w>>', { desc = 'Increase width of window' })
 vim.keymap.set('n', '<C-Left>', '<C-w><', { desc = 'Decrease width of window' })
