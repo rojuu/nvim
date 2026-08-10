@@ -109,7 +109,7 @@ local function gh(repo)
 end
 
 vim.pack.add {
-  { src = gh 'catppuccin/nvim', version = 'edefef779ab08ce1a4a404713e3012b0d202bd35' },
+  { name = 'catppuccin', src = gh 'catppuccin/nvim', version = 'edefef779ab08ce1a4a404713e3012b0d202bd35' },
   { src = gh 'nvim-lua/plenary.nvim', version = '74b06c6c75e4eeb3108ec01852001636d85a932b' },
   { src = gh 'NMAC427/guess-indent.nvim', version = '84a4987ff36798c2fc1169cbaff67960aed9776f' },
   { src = gh 'nvim-tree/nvim-web-devicons', version = '2ae6958df7ced50baac5035cec0c15799eedfbf7' },
@@ -127,12 +127,11 @@ vim.pack.add {
   { src = gh 'nvim-telescope/telescope-fzf-native.nvim', version = 'b25b749b9db64d375d782094e2b9dce53ad53a40' },
   { src = gh 'nvim-telescope/telescope-ui-select.nvim', version = '6e51d7da30bd139a6950adf2a47fda6df9fa06d2' },
   { src = gh 'nvim-telescope/telescope.nvim', version = '427b576c16792edad01a92b89721d923c19ad60f' },
-  { src = gh 'nvim-treesitter/nvim-treesitter-context', version = 'f3061339b8eaf9fda873600bc425b8d2d8502533' },
-  { src = gh 'nvim-treesitter/nvim-treesitter', version = 'cf12346a3414fa1b06af75c79faebe7f76df080a' },
   { src = gh 'stevearc/conform.nvim', version = '619363c30309d29ffa631e67c8183f2a72caa373' },
   { src = gh 'L3MON4D3/LuaSnip', version = '642b0c595e11608b4c18219e93b88d7637af27bc' },
   { src = gh 'folke/lazydev.nvim', version = 'ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d' },
   { src = gh 'saghen/blink.cmp', version = '78336bc89ee5365633bcf754d93df01678b5c08f' },
+  { src = gh 'nvim-treesitter/nvim-treesitter', version = 'main' },
 }
 
 ---
@@ -346,48 +345,57 @@ end
 --- TREESITTER
 ---
 do
-  require('treesitter-context').setup {
-    enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
-    multiwindow = false, -- Enable multiwindow support.
-    max_lines = 5, -- How many lines the window should span. Values <= 0 mean no limit.
-    min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
-    line_numbers = true,
-    multiline_threshold = 20, -- Maximum number of lines to show for a single context
-    trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
-    mode = 'topline', -- Line used to calculate context. Choices: 'cursor', 'topline'
-    -- Separator between context and content. Should be a single character string, like '-'.
-    -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
-    separator = nil,
-    zindex = 20, -- The Z-index of the context window
-    on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
-  }
+  local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+  require('nvim-treesitter').install(parsers)
 
-  require('nvim-treesitter.configs').setup {
-    ensure_installed = {
-      'bash',
-      'c',
-      'diff',
-      'html',
-      'lua',
-      'luadoc',
-      'markdown',
-      'markdown_inline',
-      'query',
-      'vim',
-      'vimdoc',
-    },
-    auto_install = true,
-    highlight = {
-      enable = true,
-      additional_vim_regex_highlighting = { 'ruby' },
-    },
-    indent = { enable = true, disable = { 'ruby' } },
-  }
+  ---@param buf integer
+  ---@param language string
+  local function treesitter_try_attach(buf, language)
+    -- Check if a parser exists and load it
+    if not vim.treesitter.language.add(language) then return end
+    -- Enable syntax highlighting and other treesitter features
+    vim.treesitter.start(buf, language)
 
-  local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
+    -- Enable treesitter based folds
+    -- For more info on folds see `:help folds`
+    -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+    -- vim.wo.foldmethod = 'expr'
+
+    -- Check if treesitter indentation is available for this language, and if so enable it
+    -- in case there is no indent query, the indentexpr will fallback to the vim's built in one
+    local has_indent_query = vim.treesitter.query.get(language, 'indents') ~= nil
+
+    -- Enable treesitter based indentation
+    if has_indent_query then vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()" end
+  end
+
+  local available_parsers = require('nvim-treesitter').get_available()
+  vim.api.nvim_create_autocmd('FileType', {
+    callback = function(args)
+      local buf, filetype = args.buf, args.match
+
+      local language = vim.treesitter.language.get_lang(filetype)
+      if not language then return end
+
+      local installed_parsers = require('nvim-treesitter').get_installed 'parsers'
+
+      if vim.tbl_contains(installed_parsers, language) then
+        -- Enable the parser if it is already installed
+        treesitter_try_attach(buf, language)
+      elseif vim.tbl_contains(available_parsers, language) then
+        -- If a parser is available in `nvim-treesitter`, auto-install it and enable it after the installation is done
+        require('nvim-treesitter').install(language):await(function() treesitter_try_attach(buf, language) end)
+      else
+        -- Try to enable treesitter features in case the parser exists but is not available from `nvim-treesitter`
+        treesitter_try_attach(buf, language)
+      end
+    end,
+  })
+
+  local parsers = require('nvim-treesitter.parsers')
 
   -- Firestore rules
-  parser_config.rules = {
+  parsers.rules = {
     install_info = {
       url = 'https://github.com/rojuu/tree-sitter-firebase-rules',
       revision = '038f798fc68314696c59c571bcc022546c3bf790',

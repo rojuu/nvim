@@ -10,6 +10,11 @@
       "src": "https://github.com/saghen/blink.cmp",
       "version": "'78336bc89ee5365633bcf754d93df01678b5c08f'"
     },
+    "catppuccin": {
+      "rev": "edefef779ab08ce1a4a404713e3012b0d202bd35",
+      "src": "https://github.com/catppuccin/nvim",
+      "version": "'edefef779ab08ce1a4a404713e3012b0d202bd35'"
+    },
     "conform.nvim": {
       "rev": "619363c30309d29ffa631e67c8183f2a72caa373",
       "src": "https://github.com/stevearc/conform.nvim",
@@ -62,7 +67,7 @@
     "nvim-treesitter": {
       "rev": "c9f9ed6c1892f629ea399f4ee7905f2686fa13f2",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
-      "version": "'cf12346a3414fa1b06af75c79faebe7f76df080a'"
+      "version": "'main'"
     },
     "nvim-treesitter-context": {
       "rev": "f3061339b8eaf9fda873600bc425b8d2d8502533",
