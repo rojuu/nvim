@@ -431,20 +431,25 @@ do
     end,
   })
 
-  local treesitter_parsers = require 'nvim-treesitter.parsers'
+  vim.api.nvim_create_autocmd('User', {
+    pattern = 'TSUpdate',
+    callback = function()
+      -- Firestore rules
+      require('nvim-treesitter.parsers').rules = {
+        install_info = {
+          url = 'https://github.com/rojuu/tree-sitter-firebase-rules',
+          revision = '038f798fc68314696c59c571bcc022546c3bf790',
+          branch = 'main',
+          files = { 'src/parser.c' },
+          generate_requires_npm = false, -- if stand-alone parser without npm dependencies
+          requires_generate_from_grammar = true, -- could regenaret in the repo, but too lazy to do that. At least the grammar file works fine
+        },
+        filetype = 'rules', -- if filetype does not match the parser name
+      }
+    end,
+  })
 
-  -- Firestore rules
-  treesitter_parsers.rules = {
-    install_info = {
-      url = 'https://github.com/rojuu/tree-sitter-firebase-rules',
-      revision = '038f798fc68314696c59c571bcc022546c3bf790',
-      branch = 'main',
-      files = { 'src/parser.c' },
-      generate_requires_npm = false, -- if stand-alone parser without npm dependencies
-      requires_generate_from_grammar = true, -- could regenaret in the repo, but too lazy to do that. At least the grammar file works fine
-    },
-    filetype = 'rules', -- if filetype does not match the parser name
-  }
+  vim.treesitter.language.register('rules', { 'rules' })
   -- TODO: Port this to lua when I'm not lazy
   -- For .rules files the ft was detected as "hog" for some reason
   vim.cmd [[au BufRead,BufNewFile *.rules set filetype=rules]]
