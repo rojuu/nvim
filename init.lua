@@ -1,3 +1,5 @@
+vim.loader.enable()
+
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = false
@@ -99,37 +101,396 @@ vim.api.nvim_create_autocmd('FocusGained', {
   end,
 })
 
-local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
-  local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
-  if vim.v.shell_error ~= 0 then
-    error('Error cloning lazy.nvim:\n' .. out)
-  end
+---Helper for github repos
+---@param repo string
+---@return string
+local function gh(repo)
+  return 'https://github.com/' .. repo
 end
 
----@type vim.Option
-local rtp = vim.opt.rtp
-rtp:prepend(lazypath)
+vim.pack.add {
+  { src = gh 'catppuccin/nvim', version = 'edefef779ab08ce1a4a404713e3012b0d202bd35' },
+  { src = gh 'nvim-lua/plenary.nvim', version = '74b06c6c75e4eeb3108ec01852001636d85a932b' },
+  { src = gh 'NMAC427/guess-indent.nvim', version = '84a4987ff36798c2fc1169cbaff67960aed9776f' },
+  { src = gh 'nvim-tree/nvim-web-devicons', version = '2ae6958df7ced50baac5035cec0c15799eedfbf7' },
+  { src = gh 'nvim-lualine/lualine.nvim', version = '221ce6b2d999187044529f49da6554a92f740a96' },
+  { src = gh 'folke/todo-comments.nvim', version = '31e3c38ce9b29781e4422fc0322eb0a21f4e8668' },
+  { src = gh 'echasnovski/mini.nvim', version = '629bf6792187e11b4829411c1648f86f28df3963' },
+  { src = gh 'echasnovski/mini.icons', versioni = '98faae31e9be1cc054ae63485e58ceb185efcad0' },
+  { src = gh 'kylechui/nvim-surround', version = '6c54643ef42016b744888b06d2381abd23f9b7ea' },
+  { src = gh 'tpope/vim-fugitive', version = '3b753cf8c6a4dcde6edee8827d464ba9b8c4a6f0' },
+  { src = gh 'sindrets/diffview.nvim', version = '4516612fe98ff56ae0415a259ff6361a89419b0a' },
+  { src = gh 'lewis6991/gitsigns.nvim', version = '31d6fb2d618bca1482b9f274751ead5f03461408' },
+  { src = gh 'stevearc/oil.nvim', version = 'b73018b75affd13fa38e2fc94ef753b465f770d7' },
+  { src = gh 'folke/which-key.nvim', version = '3aab2147e74890957785941f0c1ad87d0a44c15a' },
+  -- TODO: Need to run 'make' somehow? Or swap to dmtrKovalenko/fff?
+  { src = gh 'nvim-telescope/telescope-fzf-native.nvim', version = 'b25b749b9db64d375d782094e2b9dce53ad53a40' },
+  { src = gh 'nvim-telescope/telescope-ui-select.nvim', version = '6e51d7da30bd139a6950adf2a47fda6df9fa06d2' },
+  { src = gh 'nvim-telescope/telescope.nvim', version = '427b576c16792edad01a92b89721d923c19ad60f' },
+  { src = gh 'nvim-treesitter/nvim-treesitter-context', version = 'f3061339b8eaf9fda873600bc425b8d2d8502533' },
+  { src = gh 'nvim-treesitter/nvim-treesitter', version = 'cf12346a3414fa1b06af75c79faebe7f76df080a' },
+  { src = gh 'stevearc/conform.nvim', version = '619363c30309d29ffa631e67c8183f2a72caa373' },
+  { src = gh 'L3MON4D3/LuaSnip', version = '642b0c595e11608b4c18219e93b88d7637af27bc' },
+  { src = gh 'folke/lazydev.nvim', version = 'ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d' },
+  { src = gh 'saghen/blink.cmp', version = '78336bc89ee5365633bcf754d93df01678b5c08f' },
+}
 
-require('lazy').setup({
-  { import = 'custom.plugins' },
-}, {
-  ui = {
-    icons = vim.g.have_nerd_font and {} or {
-      cmd = '⌘',
-      config = '🛠',
-      event = '📅',
-      ft = '📂',
-      init = '⚙',
-      keys = '🗝',
-      plugin = '🔌',
-      runtime = '💻',
-      require = '🌙',
-      source = '📄',
-      start = '🚀',
-      task = '📌',
-      lazy = '💤 ',
+---
+--- THEME
+---
+require('catppuccin').setup { flavor = 'mocha' }
+vim.cmd 'colorscheme catppuccin'
+
+---
+--- GUESS INDENT
+---
+require('guess-indent').setup {
+  auto_cmd = true,
+  override_editorconfig = false,
+  filetype_exclude = {
+    'netrw',
+    'tutor',
+  },
+  buftype_exclude = {
+    'help',
+    'nofile',
+    'terminal',
+    'prompt',
+  },
+  on_tab_options = {
+    ['expandtab'] = false,
+    ['tabstop'] = 4,
+    ['softtabstop'] = 4,
+    ['shiftwidth'] = 4,
+  },
+  on_space_options = {
+    ['expandtab'] = true,
+    ['tabstop'] = 'detected',
+    ['softtabstop'] = 'detected',
+    ['shiftwidth'] = 'detected',
+  },
+}
+
+---
+--- STATUSLINE
+---
+require('lualine').setup {
+  sections = {
+    lualine_a = { 'mode' },
+    lualine_b = { 'branch', 'diff', 'diagnostics' },
+    lualine_c = { { 'filename', path = 1 } },
+    lualine_x = { 'encoding', 'fileformat', 'filetype' },
+    lualine_y = { 'progress' },
+    lualine_z = { 'location' },
+  },
+  inactive_sections = {
+    lualine_a = {},
+    lualine_b = {},
+    lualine_c = { { 'filename', path = 1 } },
+    lualine_x = { 'location' },
+    lualine_y = {},
+    lualine_z = {},
+  },
+}
+
+---
+--- TODO COMMENTS
+---
+require('todo-comments').setup {
+  signs = false,
+}
+
+---
+--- MINI
+---
+require('mini.ai').setup { n_lines = 500 }
+require('mini.surround').setup()
+local statusline = require 'mini.statusline'
+statusline.setup { use_icons = vim.g.have_nerd_font }
+---@diagnostic disable-next-line: duplicate-set-field
+statusline.section_location = function()
+  return '%2l:%-2v'
+end
+
+---
+--- DIFF VIEW
+---
+require('diffview').setup {}
+
+---
+--- GIT SIGNS
+---
+do
+  local gitsigns = require 'gitsigns'
+  gitsigns.setup {
+    signs = {
+      add = { text = '+' },
+      change = { text = '~' },
+      delete = { text = '_' },
+      topdelete = { text = '‾' },
+      changedelete = { text = '~' },
+    },
+  }
+  local next_hunk = function()
+    gitsigns.nav_hunk 'next'
+  end
+  local prev_hunk = function()
+    gitsigns.nav_hunk 'prev'
+  end
+  vim.keymap.set('n', ']g', next_hunk, { desc = 'Goto next git hunk' })
+  vim.keymap.set('n', '[g', prev_hunk, { desc = 'Goto prevgit hunk' })
+  vim.keymap.set('n', '<leader>bl', gitsigns.blame_line, { desc = 'Git [B]lame [L]line}' })
+  vim.keymap.set('n', '<leader>bb', gitsigns.blame, { desc = 'Git [B]lame Buffer' })
+  vim.keymap.set('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'Git [H]unk [P]review}' })
+  vim.keymap.set('n', '<leader>hi', gitsigns.preview_hunk_inline, { desc = 'Git [H]unk [I]inline Preview}' })
+end
+
+---
+--- OIL NVIM
+---
+require('oil').setup()
+vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+
+---
+--- WHICH KEY
+---
+require('which-key').setup {
+  delay = 500,
+  icons = {
+    mappings = vim.g.have_nerd_font,
+    keys = vim.g.have_nerd_font and {} or {
+      Up = '<Up> ',
+      Down = '<Down> ',
+      Left = '<Left> ',
+      Right = '<Right> ',
+      C = '<C-…> ',
+      M = '<M-…> ',
+      D = '<D-…> ',
+      S = '<S-…> ',
+      CR = '<CR> ',
+      Esc = '<Esc> ',
+      ScrollWheelDown = '<ScrollWheelDown> ',
+      ScrollWheelUp = '<ScrollWheelUp> ',
+      NL = '<NL> ',
+      BS = '<BS> ',
+      Space = '<Space> ',
+      Tab = '<Tab> ',
+      F1 = '<F1>',
+      F2 = '<F2>',
+      F3 = '<F3>',
+      F4 = '<F4>',
+      F5 = '<F5>',
+      F6 = '<F6>',
+      F7 = '<F7>',
+      F8 = '<F8>',
+      F9 = '<F9>',
+      F10 = '<F10>',
+      F11 = '<F11>',
+      F12 = '<F12>',
     },
   },
-})
+  spec = {
+    { '<leader>f', group = '[F]ind' },
+    { '<leader>t', group = '[T]oggle' },
+    { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+  },
+}
+
+---
+--- TELESCOPE
+---
+do
+  require('telescope').setup {
+    extensions = {
+      ['ui-select'] = {
+        require('telescope.themes').get_dropdown(),
+      },
+    },
+  }
+
+  pcall(require('telescope').load_extension, 'fzf')
+  pcall(require('telescope').load_extension, 'ui-select')
+
+  local builtin = require 'telescope.builtin'
+  vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = '[F]ind [H]elp' })
+  vim.keymap.set('n', '<leader>fk', builtin.keymaps, { desc = '[F]ind [K]eymaps' })
+  vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = '[F]ind [F]iles' })
+  vim.keymap.set('n', '<leader>fs', builtin.builtin, { desc = '[F]ind [S]elect Telescope' })
+  vim.keymap.set('n', '<leader>fw', builtin.grep_string, { desc = '[F]ind current [W]ord' })
+  vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = '[F]ind by [G]rep' })
+  vim.keymap.set('n', '<leader>fd', builtin.diagnostics, { desc = '[F]ind [D]iagnostics' })
+  vim.keymap.set('n', '<leader>fr', builtin.resume, { desc = '[F]ind [R]esume' })
+  vim.keymap.set('n', '<leader>f.', builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
+  vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = '[F]ind existing [B]uffers' })
+
+  vim.keymap.set('n', '<leader>/', function()
+    builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+      winblend = 10,
+      previewer = false,
+    })
+  end, { desc = '[/] Fuzzily search in current buffer' })
+
+  vim.keymap.set('n', '<leader>f/', function()
+    builtin.live_grep {
+      grep_open_files = true,
+      prompt_title = 'Live Grep in Open Files',
+    }
+  end, { desc = '[F]ind [/] in Open Files' })
+
+  vim.keymap.set('n', '<leader>fn', function()
+    builtin.find_files { cwd = vim.fn.stdpath 'config' }
+  end, { desc = '[F]ind [N]eovim files' })
+end
+
+---
+--- TREESITTER
+---
+do
+  require('treesitter-context').setup {
+    enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
+    multiwindow = false, -- Enable multiwindow support.
+    max_lines = 5, -- How many lines the window should span. Values <= 0 mean no limit.
+    min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+    line_numbers = true,
+    multiline_threshold = 20, -- Maximum number of lines to show for a single context
+    trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+    mode = 'topline', -- Line used to calculate context. Choices: 'cursor', 'topline'
+    -- Separator between context and content. Should be a single character string, like '-'.
+    -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+    separator = nil,
+    zindex = 20, -- The Z-index of the context window
+    on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
+  }
+
+  require('nvim-treesitter.configs').setup {
+    ensure_installed = {
+      'bash',
+      'c',
+      'diff',
+      'html',
+      'lua',
+      'luadoc',
+      'markdown',
+      'markdown_inline',
+      'query',
+      'vim',
+      'vimdoc',
+    },
+    auto_install = true,
+    highlight = {
+      enable = true,
+      additional_vim_regex_highlighting = { 'ruby' },
+    },
+    indent = { enable = true, disable = { 'ruby' } },
+  }
+
+  local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
+
+  -- Firestore rules
+  parser_config.rules = {
+    install_info = {
+      url = 'https://github.com/rojuu/tree-sitter-firebase-rules',
+      revision = '038f798fc68314696c59c571bcc022546c3bf790',
+      branch = 'main',
+      files = { 'src/parser.c' },
+      generate_requires_npm = false, -- if stand-alone parser without npm dependencies
+      requires_generate_from_grammar = true, -- could regenaret in the repo, but too lazy to do that. At least the grammar file works fine
+    },
+    filetype = 'rules', -- if filetype does not match the parser name
+  }
+  -- TODO: Port this to lua when I'm not lazy
+  -- For .rules files the ft was detected as "hog" for some reason
+  vim.cmd [[au BufRead,BufNewFile *.rules set filetype=rules]]
+end
+
+---
+--- FORMATTING
+---
+do
+  require('conform').setup {
+    notify_on_error = false,
+    format_on_save = function(bufnr)
+      local disable_filetypes = { c = true, cpp = true }
+      if disable_filetypes[vim.bo[bufnr].filetype] then
+        return nil
+      else
+        return {
+          timeout_ms = 500,
+          lsp_format = 'fallback',
+        }
+      end
+    end,
+    formatters_by_ft = {
+      lua = { 'stylua' },
+      javascript = { 'prettierd', 'prettier', stop_after_first = true },
+      javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+      typescript = { 'prettierd', 'prettier', stop_after_first = true },
+      typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+    },
+  }
+
+  vim.keymap.set('n', '<leader>F', function()
+    require('conform').format { async = true, lsp_format = 'fallback' }
+  end, { desc = '[F]ormat buffer' })
+end
+
+---
+--- AUTOCOMPLETE
+---
+do
+  require('blink-cmp').setup {
+    keymap = {
+      ['<C-e>'] = { 'hide', 'fallback' },
+      ['<CR>'] = { 'accept', 'fallback' },
+
+      ['<Tab>'] = { 'snippet_forward', 'fallback' },
+      ['<S-Tab>'] = { 'snippet_backward', 'fallback' },
+
+      ['<Up>'] = { 'select_prev', 'fallback' },
+      ['<Down>'] = { 'select_next', 'fallback' },
+      ['<C-p>'] = { 'select_prev', 'fallback_to_mappings' },
+      ['<C-n>'] = { 'select_next', 'fallback_to_mappings' },
+
+      ['<C-x>'] = { 'show', 'fallback_to_mappings' },
+
+      ['<C-b>'] = { 'scroll_documentation_up', 'fallback' },
+      ['<C-f>'] = { 'scroll_documentation_down', 'fallback' },
+
+      ['<C-k>'] = { 'show_signature', 'hide_signature', 'fallback' },
+    },
+
+    appearance = {
+      nerd_font_variant = 'mono',
+    },
+    completion = {
+      menu = {
+        draw = {
+          columns = {
+            { 'kind_icon', 'label', 'label_description', 'source_name', gap = 1 },
+          },
+          components = {
+            label_description = {
+              width = { max = 50 },
+            },
+            source_name = {
+              text = function(ctx)
+                return '[' .. ctx.source_name .. ']'
+              end,
+            },
+          },
+        },
+      },
+      documentation = { auto_show = false, auto_show_delay_ms = 500 },
+    },
+    sources = {
+      default = { 'lsp', 'path', 'snippets', 'lazydev' },
+      providers = {
+        lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
+      },
+    },
+
+    snippets = { preset = 'luasnip' },
+    fuzzy = { implementation = 'lua' },
+    signature = { enabled = true },
+  }
+end
