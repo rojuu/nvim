@@ -101,6 +101,32 @@ vim.api.nvim_create_autocmd('FocusGained', {
   end,
 })
 
+---
+--- VIM PACK
+---
+do
+  local hooks = function(ev)
+    ---@type vim.event.packchanged.data
+    local data = ev.data
+    local name, kind = data.spec.name, data.kind
+
+    ---@param cmd string[]
+    local maybe_exec = function(cmd)
+      if vim.fn.executable(cmd[1]) == 1 then
+        vim.system(cmd, { cwd = data.path })
+      end
+    end
+
+    if name == 'telescope-fzf-native.nvim' and (kind == 'install' or kind == 'update') then
+      maybe_exec { 'make' }
+    end
+    if name == 'LuaSnip' and (kind == 'install' or kind == 'update') then
+      maybe_exec { 'make', 'install_jsregexp' }
+    end
+  end
+  vim.api.nvim_create_autocmd('PackChanged', { callback = hooks })
+end
+
 ---Helper for github repos
 ---@param repo string
 ---@return string
