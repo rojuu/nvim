@@ -431,10 +431,10 @@ do
     end,
   })
 
-  local parsers = require 'nvim-treesitter.parsers'
+  local treesitter_parsers = require 'nvim-treesitter.parsers'
 
   -- Firestore rules
-  parsers.rules = {
+  treesitter_parsers.rules = {
     install_info = {
       url = 'https://github.com/rojuu/tree-sitter-firebase-rules',
       revision = '038f798fc68314696c59c571bcc022546c3bf790',
