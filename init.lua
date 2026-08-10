@@ -130,7 +130,7 @@ vim.pack.add {
   gh 'stevearc/conform.nvim',
   gh 'L3MON4D3/LuaSnip',
   gh 'folke/lazydev.nvim',
-  { src = gh 'saghen/blink.cmp', version = '78336bc89ee5365633bcf754d93df01678b5c08f' }, 
+  { src = gh 'saghen/blink.cmp', version = 'v1' }, 
   gh 'nvim-treesitter/nvim-treesitter',
 }
 
