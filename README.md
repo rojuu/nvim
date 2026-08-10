@@ -6,5 +6,5 @@ Currently tested with [NVIM v0.12.4](https://github.com/neovim/neovim/releases/t
 
 ## Initial setup
 
-First launch `nvim` to clone the deps, then run `bash setup.sh` to build the native dependencies, lastly launch `nvim` again and run `:TSUpdate`.
+First launch `nvim` to clone the deps, then run `bash setup.sh` to build the native dependencies.
 
