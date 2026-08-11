@@ -137,8 +137,9 @@ end
 vim.pack.add {
   { name = 'catppuccin', src = gh 'catppuccin/nvim' },
   gh 'nvim-lua/plenary.nvim',
-  gh 'NMAC427/guess-indent.nvim',
   gh 'nvim-tree/nvim-web-devicons',
+  gh 'MunifTanjim/nui.nvim',
+  gh 'NMAC427/guess-indent.nvim',
   gh 'nvim-lualine/lualine.nvim',
   gh 'folke/todo-comments.nvim',
   gh 'echasnovski/mini.nvim',
@@ -148,6 +149,7 @@ vim.pack.add {
   gh 'sindrets/diffview.nvim',
   gh 'lewis6991/gitsigns.nvim',
   gh 'stevearc/oil.nvim',
+  { src = gh 'nvim-neo-tree/neo-tree.nvim', version = vim.version.range '3' },
   gh 'folke/which-key.nvim',
   -- TODO: Maybe switch to using dmtrKovalenko/fff instead of telescope?
   { src = gh 'nvim-telescope/telescope-fzf-native.nvim', version = 'b25b749b9db64d375d782094e2b9dce53ad53a40' },
@@ -280,6 +282,13 @@ end
 ---
 require('oil').setup()
 vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+
+---
+--- NEO TREE
+---
+require('neo-tree').setup {}
+vim.keymap.set('n', '<leader><TAB>', '<CMD>Neotree reveal<CR>', { desc = 'Reveal current file in neotree' })
+vim.keymap.set('n', '<leader><S-TAB>', '<CMD>Neotree close<CR>', { desc = 'Close neotree' })
 
 ---
 --- WHICH KEY
