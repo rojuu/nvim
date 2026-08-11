@@ -149,7 +149,7 @@ vim.pack.add {
   gh 'lewis6991/gitsigns.nvim',
   gh 'stevearc/oil.nvim',
   gh 'folke/which-key.nvim',
-  -- TODO: Need to run 'make' somehow? Or swap to dmtrKovalenko/fff?
+  -- TODO: Maybe switch to using dmtrKovalenko/fff instead of telescope?
   { src = gh 'nvim-telescope/telescope-fzf-native.nvim', version = 'b25b749b9db64d375d782094e2b9dce53ad53a40' },
   { src = gh 'nvim-telescope/telescope-ui-select.nvim', version = '6e51d7da30bd139a6950adf2a47fda6df9fa06d2' },
   { src = gh 'nvim-telescope/telescope.nvim', version = '427b576c16792edad01a92b89721d923c19ad60f' },
