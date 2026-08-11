@@ -404,7 +404,6 @@ do
     end
   end
 
-  local available_parsers = require('nvim-treesitter').get_available()
   vim.api.nvim_create_autocmd('FileType', {
     callback = function(args)
       local buf, filetype = args.buf, args.match
@@ -415,6 +414,7 @@ do
       end
 
       local installed_parsers = require('nvim-treesitter').get_installed 'parsers'
+      local available_parsers = require('nvim-treesitter').get_available()
 
       if vim.tbl_contains(installed_parsers, language) then
         -- Enable the parser if it is already installed
