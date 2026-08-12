@@ -506,6 +506,19 @@ do
   end, {
     desc = 'Re-enable autoformat-on-save',
   })
+  vim.api.nvim_create_user_command('SaveWithoutFormatting', function()
+    local disable_autoformat = vim.g.disable_autoformat
+    vim.g.disable_autoformat = true
+
+    local ok, err = pcall(vim.cmd.write)
+    vim.g.disable_autoformat = disable_autoformat
+
+    if not ok then
+      error(err)
+    end
+  end, {
+    desc = 'Save without formatting',
+  })
 
   vim.keymap.set('n', '<leader>F', function()
     require('conform').format { async = true, lsp_format = 'fallback' }
