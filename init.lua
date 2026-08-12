@@ -474,6 +474,9 @@ do
   require('conform').setup {
     notify_on_error = false,
     format_on_save = function(bufnr)
+      if vim.g.disable_autoformat then
+        return
+      end
       local disable_filetypes = { c = true, cpp = true }
       if disable_filetypes[vim.bo[bufnr].filetype] then
         return nil
@@ -492,6 +495,17 @@ do
       typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
     },
   }
+
+  vim.api.nvim_create_user_command('FormatDisable', function()
+    vim.g.disable_autoformat = true
+  end, {
+    desc = 'Disable autoformat-on-save',
+  })
+  vim.api.nvim_create_user_command('FormatEnable', function()
+    vim.g.disable_autoformat = false
+  end, {
+    desc = 'Re-enable autoformat-on-save',
+  })
 
   vim.keymap.set('n', '<leader>F', function()
     require('conform').format { async = true, lsp_format = 'fallback' }
