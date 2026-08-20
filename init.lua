@@ -117,15 +117,32 @@ do
       end
     end
 
-    if name == 'telescope-fzf-native.nvim' and (kind == 'install' or kind == 'update') then
-      maybe_exec { 'make' }
-    end
     if name == 'LuaSnip' and (kind == 'install' or kind == 'update') then
       maybe_exec { 'make', 'install_jsregexp' }
+    end
+    if name == 'fff' and (kind == 'install' or kind == 'update') then
+      if not ev.data.active then
+        vim.cmd.packadd 'fff'
+      end
+      require('fff.download').download_or_build_binary()
     end
   end
   vim.api.nvim_create_autocmd('PackChanged', { callback = hooks })
 end
+
+vim.api.nvim_create_user_command('PackRemoveNonActive', function()
+  local non_active_packages = vim
+    .iter(vim.pack.get())
+    :filter(function(x)
+      return not x.active
+    end)
+    :map(function(x)
+      return x.spec.name
+    end)
+    :totable()
+  vim.pack.del(non_active_packages)
+  print('Removed ' .. #non_active_packages .. ' packages')
+end, { desc = 'Remove non active vim.pack packages' })
 
 ---Helper for github repos
 ---@param repo string
@@ -151,10 +168,7 @@ vim.pack.add {
   gh 'stevearc/oil.nvim',
   { src = gh 'nvim-neo-tree/neo-tree.nvim', version = vim.version.range '3' },
   gh 'folke/which-key.nvim',
-  -- TODO: Maybe switch to using dmtrKovalenko/fff instead of telescope?
-  { src = gh 'nvim-telescope/telescope-fzf-native.nvim', version = 'b25b749b9db64d375d782094e2b9dce53ad53a40' },
-  { src = gh 'nvim-telescope/telescope-ui-select.nvim', version = '6e51d7da30bd139a6950adf2a47fda6df9fa06d2' },
-  { src = gh 'nvim-telescope/telescope.nvim', version = '427b576c16792edad01a92b89721d923c19ad60f' },
+  gh 'dmtrKovalenko/fff',
   gh 'stevearc/conform.nvim',
   gh 'L3MON4D3/LuaSnip',
   gh 'folke/lazydev.nvim',
@@ -336,50 +350,17 @@ require('which-key').setup {
 }
 
 ---
---- TELESCOPE
+--- FFF
 ---
-do
-  require('telescope').setup {
-    extensions = {
-      ['ui-select'] = {
-        require('telescope.themes').get_dropdown(),
-      },
-    },
-  }
-
-  pcall(require('telescope').load_extension, 'fzf')
-  pcall(require('telescope').load_extension, 'ui-select')
-
-  local builtin = require 'telescope.builtin'
-  vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = '[F]ind [H]elp' })
-  vim.keymap.set('n', '<leader>fk', builtin.keymaps, { desc = '[F]ind [K]eymaps' })
-  vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = '[F]ind [F]iles' })
-  vim.keymap.set('n', '<leader>fs', builtin.builtin, { desc = '[F]ind [S]elect Telescope' })
-  vim.keymap.set('n', '<leader>fw', builtin.grep_string, { desc = '[F]ind current [W]ord' })
-  vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = '[F]ind by [G]rep' })
-  vim.keymap.set('n', '<leader>fd', builtin.diagnostics, { desc = '[F]ind [D]iagnostics' })
-  vim.keymap.set('n', '<leader>fr', builtin.resume, { desc = '[F]ind [R]esume' })
-  vim.keymap.set('n', '<leader>f.', builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
-  vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = '[F]ind existing [B]uffers' })
-
-  vim.keymap.set('n', '<leader>/', function()
-    builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-      winblend = 10,
-      previewer = false,
-    })
-  end, { desc = '[/] Fuzzily search in current buffer' })
-
-  vim.keymap.set('n', '<leader>f/', function()
-    builtin.live_grep {
-      grep_open_files = true,
-      prompt_title = 'Live Grep in Open Files',
-    }
-  end, { desc = '[F]ind [/] in Open Files' })
-
-  vim.keymap.set('n', '<leader>fn', function()
-    builtin.find_files { cwd = vim.fn.stdpath 'config' }
-  end, { desc = '[F]ind [N]eovim files' })
-end
+vim.keymap.set('n', '<leader>ff', function()
+  require('fff').find_files()
+end, { desc = '[F]ind [F]files' })
+vim.keymap.set('n', '<leader>fg', function()
+  require('fff').live_grep()
+end, { desc = '[F]ind by [G]rep' })
+vim.keymap.set('n', '<leader>fw', function()
+  require('fff').live_grep_under_cursor()
+end, { desc = '[F]ind current [W]ord' })
 
 ---
 --- TREESITTER
@@ -598,16 +579,8 @@ do
         vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
       end
 
-      map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
-      map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
-      map('grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-      map('gri', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-      map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-      map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+      map('gd', vim.lsp.buf.definition, '[G]oto [D]efintion')
       map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-      map('gO', require('telescope.builtin').lsp_document_symbols, 'Open Document Symbols')
-      map('gW', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
-      map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
 
       local client = vim.lsp.get_client_by_id(event.data.client_id)
       if client and client:supports_method('textDocument/documentHighlight', event.buf) then
