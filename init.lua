@@ -152,7 +152,7 @@ local function gh(repo)
 end
 
 vim.pack.add {
-  { name = 'catppuccin', src = gh 'catppuccin/nvim' },
+  { name = 'rose-pine', src = gh 'rose-pine/neovim' },
   gh 'nvim-lua/plenary.nvim',
   gh 'nvim-tree/nvim-web-devicons',
   gh 'MunifTanjim/nui.nvim',
@@ -184,8 +184,8 @@ vim.pack.add {
 ---
 --- THEME
 ---
-require('catppuccin').setup { flavor = 'mocha' }
-vim.cmd 'colorscheme catppuccin'
+require('rose-pine').setup()
+vim.cmd 'colorscheme rose-pine'
 
 ---
 --- GUESS INDENT
