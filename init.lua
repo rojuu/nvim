@@ -1,5 +1,3 @@
-vim.loader.enable()
-
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = false
@@ -100,6 +98,20 @@ vim.api.nvim_create_autocmd('FocusGained', {
     vim.cmd 'checktime'
   end,
 })
+
+-- `sudo nvim` keeps $HOME on macOS, so root would write into my nvim cache/data
+-- folders and leave root-owned files behind. Run a bare nvim instead.
+-- We skip anything below this e.g. all plugins and such, everything above should be fine
+if vim.uv.getuid() == 0 then
+  vim.o.shadafile = 'NONE'
+  vim.o.swapfile = false
+  vim.o.undofile = false
+  return
+end
+
+-- needs to happen after the sudo check above
+-- with this enabled nvim can write root-owned files into ~/.cache/nvim/luac
+vim.loader.enable()
 
 ---
 --- VIM PACK
