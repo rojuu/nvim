@@ -196,7 +196,7 @@ vim.pack.add {
 ---
 --- THEME
 ---
-require('rose-pine').setup()
+require('rose-pine').setup {}
 vim.cmd 'colorscheme rose-pine'
 
 ---
